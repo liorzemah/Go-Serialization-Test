@@ -6,6 +6,10 @@ import (
 	"unsafe"
 )
 
+const KB = 1024
+const MB = 1024 * KB
+const GB = 1024 * MB
+
 type NetworkProtocol interface {
 	serialize() []byte
 	deserialize([]byte)
@@ -120,20 +124,34 @@ func timeDuration(begin time.Time , end time.Time) string {
 	}
 }
 
-func main() {
-	const KB = 1024
-	const MB = 1024 * KB
-	const GB = 1024 * MB
+func bytesFormatting(size uint64) string{
+	if (size > GB) {
+		return fmt.Sprintf("%.3f GB (%d Bytes)", float64(size)/GB, size)
+	}
+	if (size > MB){
+		return fmt.Sprintf("%.3f MB (%d Bytes)", float64(size)/MB, size)
+	}
+	if (size > KB){
+		return fmt.Sprintf("%.3f KB (%d Bytes)", float64(size)/KB, size)
+	}
+	return fmt.Sprintf("%d Bytes", size)
+}
 
+func main() {
 	const PAYLOAD_SIZE uint16 = 65535 - 28 /* 2 pow 16 - (udp header size) */ - 18 /* fileSlice size without data field*/
 	const SIZE_OF_FILE uint64 = 20 * GB / uint64(PAYLOAD_SIZE) * uint64(PAYLOAD_SIZE)
 	const COUNT_OF_PACKETS uint64 = SIZE_OF_FILE / uint64(PAYLOAD_SIZE)
+
+
+	fmt.Println(bytesFormatting(SIZE_OF_FILE))
 
 	var fileHandler FileHandler
 	fileHandler.filename = "lior"
 	fileHandler.path = "C:/"
 	fileHandler.id = 256
 	fileHandler.size = SIZE_OF_FILE
+
+
 
 	fileHandler2 := FileHandler{"beta8989", "D:/", 1, SIZE_OF_FILE}
 
